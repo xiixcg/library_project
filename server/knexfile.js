@@ -8,8 +8,8 @@ module.exports = {
       database: 'library-books',
       user:     'postgres',
       password: 'docker',
-      host: '172.17.0.2',
-      port:'5432'
+      host: 'localhost',
+      port:'8008'
     }
   },
 
