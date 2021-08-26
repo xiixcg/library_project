@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  front-end:
+    build: front-end/
+    depends_on:
+      - 'database'
+    network_mode: "host"
+  server:
+    build: server/
+    depends_on:
+      - 'database'
+    network_mode: "host"
+  database:
+    image: postgres
+    ports: 
+      - '8008:5432'
+    volumes: 
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=docker
