@@ -3,6 +3,7 @@ const app = express();
 const port = 3030;
 const knex = require('knex')(require('./knexfile.js')['development']);
 const cors = require('cors');
+const e = require('express');
 
 var options = {
   "origin": "*",
@@ -148,11 +149,32 @@ app.patch('/api/books/:bookId/checkout/:userId', (req, res) => {
 });
 
 //Sets checked_out_to and checked_out_until of a book entry from books table, matching the bookId
-app.patch('/api/books/:bookId/return', (res, req) => {
-
+app.patch('/api/books/:bookId/return', (req, res) => {
+  const parsedBookId = parseInt(req.params.bookId);
+  if(parsedBookId) {
+    knex.from('books')
+      .update({
+        checked_out_to: null,
+        checked_out_until: null
+      })
+      .where({'id': parsedBookId})
+      .returning('*')
+      .then(data => {
+        if(data.length === 0) {
+          res.status(404).json({message: `No book with id ${parsedBookId} found.`})
+        } else {
+          res.status(200).json(data[0]);
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(500).send();
+      })
+  } else {
+    res.status(400).json({message: `Bad request: received book id ${req.params.bookId}`})
+  }
 })
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
-
 });
